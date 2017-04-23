@@ -7,7 +7,7 @@ module.exports = {
   addFav(req,res) {
     let decoded = Help.decode(req.headers.token)
     new Fav({
-      userId: decoded.id
+      userId: decoded.id,
       name: req.body.name,
       url: req.body.url,
       location: {
@@ -20,7 +20,7 @@ module.exports = {
       user_rating: {
         aggregate_rating: req.body.aggregate_rating,
         rating_text: req.body.rating_text
-      }
+      },
       average_cost_for_two: req.body.average_cost_for_two,
       currency: req.body.currency
     }).save((err, fav)=> {
@@ -60,6 +60,15 @@ module.exports = {
     })
   },
   getFavs(req,res) {
-
+    Fav.find()
+      .populate('userId')
+      .exec((err,favs)=> {
+        if(err) {
+          console.log(err)
+          res.status(400).send(err)
+        } else {
+          res.send(favs)
+        }
+      })
   }
 }

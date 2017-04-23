@@ -1,19 +1,19 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const should = chai.should()
-const mongoose = require('mongoose')
-const Memo = require('../models/memo')
+const Favs = require('../models/fav-place')
+const User = require('../models/user')
 const server = require('../server')
 
 chai.use(chaiHttp)
 
-describe('Memo Test', ()=> {
+describe('USER TEST', ()=> {
 let currentTest
 
   beforeEach((done)=> {
-    new Memo({
-      title: 'Test 1',
-      content: 'Test 1 memo for a good app'
+    new User({
+      email: 'user1@mail.com',
+      password: 'test'
     }).save((err, data)=> {
       if(err) {
         console.log(err)
@@ -25,59 +25,77 @@ let currentTest
   })
 
   afterEach((done)=> {
-    Memo.collection.remove({})
+    User.collection.remove({})
     currentTest = ''
     done()
   })
 
-  it('Should read all memo from database', function(done) {
+  it('Register should add 1 new user data into database', function(done) {
     chai.request(server)
-      .get('/api')
+      .post('/user/register')
+      .send({
+        email: 'user2@mail.com',
+        password: 'test'
+      })
       .end(function(err, res) {
         res.should.have.status(200)
-        res.body.should.be.a('array')
-        done()
+        res.body.should.have.property('email')
+        res.body.should.have.property('password')
+        res.body.email.should.equal('user2@mail.com')
+        User.find((err,users)=> {
+          users.should.be.a('array')
+          users.length.should.equal(2)
+          done()
+        })
       })
   })
 
-  it('Should create a memo in database', (done)=> {
+  it('Correct password - User should be logged in and token created', (done)=> {
     chai.request(server)
-      .post('/api')
+      .post('/user/login')
       .send({
-        title: 'Test Memo',
-        content: 'Text content memo'
+        email: currentTest.email,
+        password: currentTest.password
       })
       .end((err,res)=> {
+        console.log(currentTest)
         res.should.have.status(200)
-        res.body.title.should.equal('Test Memo')
-        res.body.content.should.equal('Text content memo')
+        res.body.should.be.a('string')
         done()
       })
   })
 
-  it('Should update 1 item in database', (done)=> {
+  it('Wrong password - should get status 401 and no token created', (done)=> {
     chai.request(server)
-      .put('/api/'+currentTest._id)
+      .post('/user/login')
       .send({
-        title: 'Test 2',
-        content: 'Test 1 berubah jadi test 2'
+        email: 'user1@mail.com',
+        password: 'wrong'
       })
       .end((err,res)=> {
-        res.should.have.status(200)
-        res.body.should.have.property('title')
-        res.body.title.should.equal('Test 2')
-        res.body.content.should.equal('Test 1 berubah jadi test 2')
+        res.should.have.status(401)
         done()
       })
   })
 
-  it('Should delete 1 item in database', (done)=> {
+  it('Should get 1 user information', (done)=> {
     chai.request(server)
-      .delete('/api/'+currentTest._id)
+      .get('/user/'+currentTest._id)
       .end((err,res)=> {
         res.should.have.status(200)
-        res.body.should.have.property('title')
-        res.body.should.have.property('content')
+        res.body.should.have.property('email')
+        res.body.should.have.property('favouritePlaces')
+        res.body.favouritePlaces.should.be.a('array')
+        done()
+      })
+  })
+
+  it('Should delete 1 user in database', (done)=> {
+    chai.request(server)
+      .delete('/user/'+currentTest._id)
+      .end((err,res)=> {
+        res.should.have.status(200)
+        res.body.should.have.property('email')
         done()
       })
   })

@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 let favSchema = new Schema({
-  userId: {type: Schema.Types.ObjectId, ref:'User'}
+  userId: {type: Schema.Types.ObjectId, ref:'User'},
   name: String,
   url: String,
   location: {
@@ -15,8 +15,8 @@ let favSchema = new Schema({
   user_rating: {
     aggregate_rating: String,
     rating_test: String
-  }
-  average_cost_for two: Number,
+  },
+  average_cost_for_two: Number,
   currency: String
 })
 

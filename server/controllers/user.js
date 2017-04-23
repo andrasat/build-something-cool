@@ -28,9 +28,19 @@ module.exports = {
     let token = jwt.sign({id: req.user._id, email: req.user.email}, process.env.SECRET)
     res.send(token)
   },
+  getUsers(req,res) {
+    User.find()
+      .populate('favouritePlaces')
+      .exec((err, users)=> {
+        if(err) {
+          res.status(400).send(err)
+        } else {
+          res.send(users)
+        }
+      })
+  },
   getOneUser(req,res) {
-    let decoded = Help.decode(req.headers.token)
-    User.findById(decoded.id)
+    User.findById(req.params.id)
       .populate('favouritePlaces')
       .exec((err,user)=> {
         if(err) {

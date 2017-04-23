@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const cors = require('cors')
+const passport = require('passport')
 const port = 3000 || process.env.PORT
 
 const app = express()
@@ -23,9 +24,14 @@ db.once('open', ()=> {
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
+app.use(passport.initialize())
 
 // App routes
+const user = require('./routes/user')
+const fav = require('./routes/fav-place')
 
+app.use('/user', user)
+app.use('/fav', fav)
 
 // Server listen
 let server = app.listen(port)
