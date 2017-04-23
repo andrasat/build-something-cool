@@ -14,22 +14,16 @@ passport.use(new localStrategy({
   (username, password, done)=> {
     UserModel.findOne({email: username}, (err,user)=> {
       if(err) {
-        // console.log('-1-', err)
         done(err)
       } else if(!user) {
-        // console.log('User not found')
         done(null, false)
       } else {
-        // console.log(user)
         bcrypt.compare(password, user.password, (err,res)=> {
           if(err) {
-            // console.log('-2-', err)
             done(err)
           } else if(!res) {
-            // console.log('Wrong Password')
             done(null, false)
           } else {
-            // console.log(user)
             done(null, user)
           }
         })

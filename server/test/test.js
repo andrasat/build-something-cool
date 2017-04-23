@@ -50,7 +50,7 @@ let currentTest
       })
   })
 
-  it('Correct password - User should be logged in and token created', (done)=> {
+  it('Correct password - User logged in and token should be created', (done)=> {
     chai.request(server)
       .post('/user/login')
       .send({
@@ -58,7 +58,6 @@ let currentTest
         password: currentTest.password
       })
       .end((err,res)=> {
-        console.log(currentTest)
         res.should.have.status(200)
         res.body.should.be.a('string')
         done()
