@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 let favSchema = new Schema({
+  userId: {type: Schema.Types.ObjectId, ref:'User'}
   name: String,
   url: String,
   location: {
