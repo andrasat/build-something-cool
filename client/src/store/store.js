@@ -3,16 +3,13 @@ export const state = {
   isSuccess : false,
   isError : false,
   userToken : localStorage.getItem('token') || null,
-  userNow : localStorage.getItem('username') || null,
   isLogin: false,
-  modalClass: {
-    'modal': true,
-    'is-active': false
-  },
   browserLoc: {
     lat: -6.121435,
     lon: 106.774124
-  }
+  },
+  cityId: 0,
+  zomatoNearbyList: []
 }
 
 export const getters = {
@@ -25,14 +22,17 @@ export const getters = {
   getLoginStatus(state) {
     return state.isLogin
   },
-  getUserNow(state) {
-    return state.userNow
-  },
   getModalClass(state) {
     return state.modalClass
   },
   getBrowserLoc(state) {
     return state.browserLoc
+  },
+  getCityId(state) {
+    return state.cityId
+  },
+  getZomatoNearbyList(state) {
+    return state.zomatoNearbyList
   }
 }
 
@@ -64,6 +64,34 @@ export const mutations = {
     } else {
       alert('Geolocation is not supported in your browser')
     }
+  },
+  REQ_BYCITY(state, val) {
+    axios.get('https://developers.zomato.com/api/v2.1/cities?q='+val, {
+      headers: {'user-key': 'e7b58b263260bca07fc5ceb9ff449c15'}
+    }).then((res)=> {
+      state.cityId = res.data.location_suggestions[0].id
+
+      axios.get('https://developers.zomato.com/api/v2.1/search?entity_id='+state.cityId+'&entity_type=city&sort=rating', {
+        headers: {'user-key': 'e7b58b263260bca07fc5ceb9ff449c15'}
+      }).then((res)=> {
+        state.zomatoNearbyList = res.data.restaurants
+      }).catch((err)=> {
+        console.log(err)
+        alert('Zomato API Error')
+      })
+    }).catch((err)=> {
+      alert('Not found')
+    })
+  },
+  REQ_ZOMATONEARBY(state) {
+    axios.get('https://developers.zomato.com/api/v2.1/search?lat='+state.browserLoc.lat+'&lon='+state.browserLoc.lon+'&sort=rating', {
+      headers: {'user-key': 'e7b58b263260bca07fc5ceb9ff449c15'}
+    }).then((res)=> {
+      state.zomatoNearbyList = res.data.restaurants
+    }).catch((err)=> {
+      console.log(err)
+      alert('Zomato API Error')
+    })
   }
 }
 
@@ -82,5 +110,14 @@ export const actions = {
   },
   changeBrowserLoc({commit}) {
     commit('SET_BROWSERLOC')
+  },
+  changeCityId({commit}, val) {
+    commit('SET_CITYID', val)
+  },
+  reqZomatoNearby({commit}) {
+    commit('REQ_ZOMATONEARBY')
+  },
+  reqZomatoByCity({commit}, val) {
+    commit('REQ_BYCITY', val)
   }
 }

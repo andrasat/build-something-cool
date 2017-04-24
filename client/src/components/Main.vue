@@ -4,14 +4,17 @@
       <div class="column is-8">
         <div class="box">
           <div class="field">
-            <label class="label">Find Restaurants within city</label>
+            <label class="label">Find Restaurants within city (Indonesia: Jakarta, Bandung, Bali)</label>
             <p class="control">
-              <input class="input" type="text" v-model="city" placeholder="Input a city here">
+              <input class="input" type="text" @keyup.enter="reqZomatoByCity(city)" v-model="city" placeholder="Input a city here">
+            </p>
+            <p class="control">
+              <button class="button is-primary" @click="reqZomatoByCity(city)">Submit</button>
             </p>
           </div>
         </div>
         <div class="columns is-multiline">
-          <div v-for="restaurant in zomatoCountryList" class="column is-3">
+          <div v-for="restaurant in getZomatoNearbyList" class="column is-3">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-4by3">
@@ -21,9 +24,13 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <a class="title is-5" :href="restaurant.restaurant.url" target="_blank">{{ restaurant.restaurant.name }}<span class="rating subtitle is-6">{{ restaurant.restaurant.user_rating.aggregate_rating }}</span></a>
+                    <a class="title is-5" :href="restaurant.restaurant.url" target="_blank">{{ restaurant.restaurant.name }}</a>
+                    <span class="rating subtitle is-6">{{ restaurant.restaurant.user_rating.aggregate_rating }}</span>
                   </div>
                 </div>
+              </div>
+              <div v-if="getLoginStatus" class="content">
+                <button class="button is-primary add-fav" @click="addFav(restaurant.restaurant)">Add to fav</button>
               </div>
             </div>
           </div>
@@ -46,49 +53,52 @@ export default {
   data () {
     return {
       city: '',
-      cityId: null,
-      zomatoCountryList : [],
       srcFrame: 'https://www.zomato.com/widgets/res_search_widget.php?lat='+this.$store.state.browserLoc.lat+'&lon='+this.$store.state.browserLoc.lon+'&language_id=1&theme=red&hideCitySearch=on&hideResSearch=on&widgetType=small&sort=distance'
     }
   },
   computed: {
     ...mapGetters([
-      'getBrowserLoc'
+      'getBrowserLoc',
+      'getLoginStatus',
+      'getZomatoNearbyList'
     ])
   },
   methods: {
     ...mapActions([
-      'changeBrowserLoc'
+      'changeBrowserLoc',
+      'reqZomatoNearby',
+      'reqZomatoByCity'
     ]),
-    getZomatoCity() {
-      let self = this
-      axios.get('https://developers.zomato.com/api/v2.1/cities?q='+self.city, {
-        headers: {'user-key': 'e7b58b263260bca07fc5ceb9ff449c15'}
-      }).then((res)=> {
-        res.body.location_suggestions[0].id
-      }).catch((err)=> {
-        alert('Cannot find')
-      })
-    },
-    getZomatoRestaurantList() {
-      let self = this
-      if(this.cityId == null) {
-        axios.get('https://developers.zomato.com/api/v2.1/search?lat='+this.$store.state.browserLoc.lat+'&lon='+this.$store.state.browserLoc.lon, {
-          headers: {'user-key': 'e7b58b263260bca07fc5ceb9ff449c15'}
-        }).then((res)=> {
-          self.zomatoCountryList = res.data.restaurants
-        }).catch((err)=> {
-          console.log(err)
-          alert('Zomato API Error')
-        })
-      } else {
+    addFav(data) {
+      axios.post('http://localhost:3000/fav', {
+        userId: decoded.id,
+        name: data.name,
+        url: data.url,
+        location: {
+          address: data.address,
+          city: data.city,
+          city_id: data.city_id,
+          country_id: data.country_id
+        },
+        user_rating: {
+          aggregate_rating: data.aggregate_rating,
+          rating_text: data.rating_text
+        },
+        average_cost_for_two: data.average_cost_for_two,
+        currency: data.currency,
+        featured_image: data.featured_image
+      }, {headers: {'token': localStorage.getItem('token')}})
+        .then((res)=> {
 
-      }
+        })
+        .catch((err)=> {
+          alert('Server error')
+        })
     }
   },
   mounted() {
     this.changeBrowserLoc()
-    this.getZomatoRestaurantList()
+    this.reqZomatoNearby()
   }
 }
 </script>
@@ -102,5 +112,8 @@ export default {
   background-color: #E8A699;
   border-radius: 25%;
   padding: 0.25em;
+}
+.add-fav {
+  margin: 0.25em;
 }
 </style>
