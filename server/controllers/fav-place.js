@@ -47,7 +47,7 @@ module.exports = {
         console.log(err)
         res.status(400).send(err)
       } else {
-        User.update({_id: decoded.id}, {$pullAll: {favouritePlaces: fav._id}}, {safe: true})
+        User.update({_id: decoded.id}, {$pullAll: [{favouritePlaces: fav._id}]}, {safe: true})
           .exec((error, result)=> {
             if(error) {
               console.log(error)

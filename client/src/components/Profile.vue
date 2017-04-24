@@ -18,9 +18,9 @@
         </article>
         <article v-if="favList.length > 0" class="box">
           <div class="content is-medium">
-            <div v-for="place in favList">
+            <div v-for="place in favList" class="place-list">
               <p><a :href="place.url" target="_blank">{{ place.name }}</a>
-                <a id="delete" class="button is-danger" @click="deleteFav(place)"><span class="icon is-medium"><i class="fa fa-times"></i></span></a>
+                <a id="delete" class="button is-danger" @click="deleteFavs(place)"><span class="icon is-medium"><i class="fa fa-times"></i></span></a>
               </p>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default {
 .is-three-quarters {
   margin: auto;
 }
-#delete {
-  float: right;
+.place-list {
+  margin: 0.25em;
 }
 </style>

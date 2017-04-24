@@ -88,7 +88,7 @@ export default {
         featured_image: data.featured_image
       }, {headers: {'token': localStorage.getItem('token')}})
         .then((res)=> {
-
+          alert('added')
         })
         .catch((err)=> {
           alert('Server error')
