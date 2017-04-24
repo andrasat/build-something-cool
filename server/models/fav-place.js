@@ -13,7 +13,7 @@ let favSchema = new Schema({
   },
   user_rating: {
     aggregate_rating: String,
-    rating_test: String
+    rating_text: String
   },
   average_cost_for_two: Number,
   currency: String,

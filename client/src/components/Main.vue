@@ -15,13 +15,13 @@
             <div class="card">
               <div class="card-image">
                 <figure class="image is-4by3">
-                  <img :src="restaurant.featured_image" alt="Featured Image">
+                  <img :src="restaurant.restaurant.featured_image" alt="Featured Image">
                 </figure>
               </div>
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <a class="title is-3" href="">Test <span class="rating subtitle is-6">4.8</span></a>
+                    <a class="title is-5" :href="restaurant.restaurant.url" target="_blank">{{ restaurant.restaurant.name }}<span class="rating subtitle is-6">{{ restaurant.restaurant.user_rating.aggregate_rating }}</span></a>
                   </div>
                 </div>
               </div>
@@ -73,18 +73,22 @@ export default {
     getZomatoRestaurantList() {
       let self = this
       if(this.cityId == null) {
-        axios.get('https://developers.zomato.com/api/v2.1/search?lat='+self.getBrowserLoc.lat+'&lon='+self.getBrowserLoc.lon, {
+        axios.get('https://developers.zomato.com/api/v2.1/search?lat='+this.$store.state.browserLoc.lat+'&lon='+this.$store.state.browserLoc.lon, {
           headers: {'user-key': 'e7b58b263260bca07fc5ceb9ff449c15'}
         }).then((res)=> {
-          self.zomatoCountryList = res.body.restaurants
+          self.zomatoCountryList = res.data.restaurants
         }).catch((err)=> {
+          console.log(err)
           alert('Zomato API Error')
         })
+      } else {
+
       }
     }
   },
   mounted() {
     this.changeBrowserLoc()
+    this.getZomatoRestaurantList()
   }
 }
 </script>
