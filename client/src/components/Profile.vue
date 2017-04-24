@@ -5,7 +5,7 @@
         <article class="box">
           <div v-if="userData" class="content is-large">
             <h2 class="subtitle is-3">{{ userData.email }}</h2>
-            <p>Your favourite places : {{ userData.favouritePlaces.length }}</p>
+            <p>Your favourite places : {{ listLength }}</p>
           </div>
           <div v-if="getSuccess" class="notification is-success has-text-centered">
             <button class="delete"></button>
@@ -38,20 +38,62 @@ export default {
   data() {
     return {
       userData: {},
-      favList: []
+      favList: [],
+      listLength: 0
     }
+  },
+  computed: {
+    ...mapGetters([
+      'getError',
+      'getSuccess'
+    ])
   },
   methods: {
     ...mapActions([
-
+      'setSuccess',
+      'setError'
     ]),
-    deleteFavs() {
-
+    deleteFavs(data) {
+      let self = this
+      axios.delete('http://localhost:3000/fav/'+data._id, {
+        headers: {token : localStorage.getItem('token')}
+      })
+        .then((res)=> {
+          self.favList.splice(self.favList.indexOf(data), 1)
+          self.setSuccess(true)
+          setTimeout(()=> {
+            self.setSuccess(false)
+          }, 2500)
+        })
+        .catch((err)=> {
+          self.setError(true)
+          setTimeout(()=> {
+            self.setError(false)
+            window.location.reload()
+          }, 3500)
+        })
+    },
+    getUserData() {
+      let self = this
+      axios.get('http://localhost:3000/user/'+localStorage.getItem('id'))
+        .then((res)=> {
+          self.userData = res.data
+          self.favList = res.data.favouritePlaces
+          self.listLength = res.data.favouritePlaces.length
+        })
+        .catch((err)=> {
+          alert('Server Error')
+        })
     }
+  },
+  mounted() {
+    this.getUserData()
   }
 }
 </script>
 
 <style scoped>
-
+.is-three-quarters {
+  margin: auto;
+}
 </style>

@@ -26,7 +26,7 @@ module.exports = {
   },
   login(req,res) {
     let token = jwt.sign({id: req.user._id, email: req.user.email}, process.env.SECRET)
-    res.send(token)
+    res.send({'token': token, 'id': req.user._id})
   },
   getUsers(req,res) {
     User.find()

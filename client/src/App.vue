@@ -9,7 +9,7 @@
         <span v-if="getLoginStatus == false" class="nav-item">or</span>
         <router-link v-if="getLoginStatus == false" to="/login" class="nav-item">Login</router-link>
         <router-link v-if="getLoginStatus" to="/profile" class="nav-item">Profile</router-link>
-        <a v-if="getLoginStatus" @click="" class="nav-item">Logout</a>
+        <a v-if="getLoginStatus" @click="logout()" class="nav-item">Logout</a>
       </div>
     </nav>
     <router-view></router-view>
@@ -27,10 +27,18 @@ export default {
     ])
   },
   methods: {
+    ...mapActions([
+      'ifLogin'
+    ]),
     logout() {
       localStorage.removeItem('token')
+      localStorage.removeItem('id')
+      this.$router.push('/')
       window.location.reload()
     }
+  },
+  mounted() {
+    this.ifLogin()
   }
 }
 </script>

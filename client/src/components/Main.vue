@@ -71,7 +71,6 @@ export default {
     ]),
     addFav(data) {
       axios.post('http://localhost:3000/fav', {
-        userId: decoded.id,
         name: data.name,
         url: data.url,
         location: {

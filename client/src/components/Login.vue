@@ -71,6 +71,7 @@ export default {
       })
         .then((res)=> {
           localStorage.setItem('token', res.data.token)
+          localStorage.setItem('id', res.data.id)
           self.setSuccess(true)
           setTimeout(()=> {
             self.setSuccess(false)

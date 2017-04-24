@@ -71,11 +71,18 @@ export default {
       })
         .then((res)=> {
           self.setSuccess(true)
-          setTimeout(()=> {self.setSuccess(false)}, 3500)
+          setTimeout(()=> {
+            self.setSuccess(false)
+            this.$router.push('/')
+            window.location.reload()
+          }, 3500)
         })
         .catch((err)=> {
           self.setError(true)
-          setTimeout(()=> {self.setError(false)}, 3500)
+          setTimeout(()=> {
+            self.setError(false)
+            window.location.reload()
+          }, 3500)
         })
     },
     validateEmail() {
