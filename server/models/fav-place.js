@@ -7,7 +7,6 @@ let favSchema = new Schema({
   url: String,
   location: {
     address: String,
-    locality: String,
     city: String,
     city_id: Number,
     country_id: Number
@@ -17,7 +16,8 @@ let favSchema = new Schema({
     rating_test: String
   },
   average_cost_for_two: Number,
-  currency: String
+  currency: String,
+  featured_image: String
 })
 
 let Fav  = mongoose.model('Fav', favSchema)

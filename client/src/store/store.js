@@ -8,6 +8,10 @@ export const state = {
   modalClass: {
     'modal': true,
     'is-active': false
+  },
+  browserLoc: {
+    lat: -6.121435,
+    lon: 106.774124
   }
 }
 
@@ -26,6 +30,9 @@ export const getters = {
   },
   getModalClass(state) {
     return state.modalClass
+  },
+  getBrowserLoc(state) {
+    return state.browserLoc
   }
 }
 
@@ -45,6 +52,18 @@ export const mutations = {
   },
   SET_MODALACTIVE(state, value) {
     state.modalClass['is-active'] = value
+  },
+  SET_BROWSERLOC(state) {
+    if('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((pos)=> {
+        state.browserLoc = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude
+        }
+      })
+    } else {
+      alert('Geolocation is not supported in your browser')
+    }
   }
 }
 
@@ -60,5 +79,8 @@ export const actions = {
   },
   changeModalStatus({commit}, value) {
     commit('SET_MODALACTIVE', value)
+  },
+  changeBrowserLoc({commit}) {
+    commit('SET_BROWSERLOC')
   }
 }

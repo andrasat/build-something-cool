@@ -12,7 +12,6 @@ module.exports = {
       url: req.body.url,
       location: {
         address: req.body.address,
-        locality: req.body.locality,
         city: req.body.city,
         city_id: req.body.city_id,
         country_id: req.body.country_id
@@ -22,7 +21,8 @@ module.exports = {
         rating_text: req.body.rating_text
       },
       average_cost_for_two: req.body.average_cost_for_two,
-      currency: req.body.currency
+      currency: req.body.currency,
+      featured_image: req.body.featured_image
     }).save((err, fav)=> {
       if(err) {
         console.log(err)
